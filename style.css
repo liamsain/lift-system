@@ -5,3 +5,6 @@ canvas {
     width: 800px;
     border: 1px solid black;
 }
+#lift-floor-input {
+    float: left;
+}
