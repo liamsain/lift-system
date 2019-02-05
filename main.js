@@ -32,6 +32,10 @@ class Building {
   }
 
   drawLift(ctx) {
+    if(this.liftY > this.y) {
+      this.liftY -= 1;
+
+    }
     const liftCenterTopX = this.liftX + this.liftWidth / 2;
     ctx.moveTo(liftCenterTopX, this.liftY);
     ctx.lineTo(liftCenterTopX, this.y); 
@@ -59,6 +63,7 @@ class Person {
     this.colour = "#3dc92e";
     this.whatever = 5;
   };
+
   draw(ctx) {
     ctx.beginPath();
     ctx.rect(this.x, this.y, this.width, this.height);
@@ -74,10 +79,10 @@ function drawPeople() {
     people[i].draw(ctx);
   }
 }
+let building = new Building();
 
 function draw() {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-  const building = new Building();
   building.draw(ctx);
   drawPeople();
   requestAnimationFrame(draw);
