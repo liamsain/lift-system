@@ -18,7 +18,7 @@ class Building {
     }
 
     drawFloors(ctx) {
-        for (let i = 0; i < this.height; i += this.floorHeight) {
+        for (let i = this.floorHeight; i < this.height; i += this.floorHeight) {
             ctx.moveTo(this.x + this.lift.width + this.strokeLineWidth, this.y + i);
             ctx.lineTo(this.x + this.width, this.y + i);
         }
