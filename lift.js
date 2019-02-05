@@ -28,7 +28,7 @@ class Lift {
         const groundFloorY = this.lowerLimitY - this.height;
         const distanceToTravel = (number + 1) * this.height;
         const destY = groundFloorY - distanceToTravel;
-        if(destY < this.lowerLimitY && destY > this.upperLimitY) {
+        if(destY <= this.lowerLimitY && destY >= this.upperLimitY) {
             this.destY = destY;
         }
     }
