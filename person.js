@@ -1,3 +1,4 @@
+const hexNumbers = '0123456789ABCDEF';
 
 class State {
   constructor() {
@@ -20,13 +21,21 @@ class Person {
     this.y = y - this.height;
     this.building = building;
     this.width = 10;
-    this.colour = "#3dc92e";
+    this.colour = this.getRandomColour(); 
     this.whatever = 5;
     this.state = new State();
     this.speed = 1;
     this.destinationFloor = 0;
     this.workingTime = 0;
     this.timeWorked = 0;
+  }
+
+  getRandomColour() {
+    let colour = '#';
+    for(let i = 0; i < 6; i++){
+      colour += hexNumbers[Math.floor(Math.random() * hexNumbers.length)];
+    }
+    return colour;
   }
 
   update() {
