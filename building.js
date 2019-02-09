@@ -47,6 +47,7 @@ class Building {
 
   drawFloorNumbers(ctx){
     ctx.font = "12px Arial";
+    ctx.fillStyle = "black";
     this.floorsYStartPositions.forEach((floor, i) => ctx.fillText(i, this.x + this.width - 20,  floor - 10));
   }
 
