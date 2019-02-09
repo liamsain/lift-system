@@ -3,8 +3,7 @@ canvas {
     margin: auto;
     display: block;
     width: 800px;
-    border: 1px solid black;
+    border: 1px solid black
 }
-#lift-floor-input {
-    float: left;
+#people-count-input{
 }
