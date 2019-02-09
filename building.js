@@ -6,16 +6,26 @@ class Building {
     this.height = canvas.height * 0.8;
     this.colour = "#000000";
     this.floorHeight = this.height / 10;
-    this.strokeLineWidth = 7;
+    this.strokeLineWidth = 6;
     this.lift = new Lift(
       this.x + this.strokeLineWidth,
       this.y + this.height,
       this.width / 8,
       this.floorHeight,
-      this.y
+      this
     );
-    this.entrance = { x: this.x + this.width, y: this.y + this.height };
+    this.entrance = { x: this.x + this.width, y: this.y + this.height - (this.strokeLineWidth / 2) };
+    this.init();
   }
+  
+  init() {
+    const floorsYStartPositions = [];
+    for (let i = this.height + this.y; i > this.y; i -= this.floorHeight) {
+      floorsYStartPositions.push(i);
+    }
+    this.floorsYStartPositions = floorsYStartPositions;
+  }
+
   drawOutline(ctx) {
     ctx.moveTo(this.x, this.y);
     ctx.lineTo(this.x, this.y + this.height);
@@ -24,11 +34,19 @@ class Building {
     ctx.lineTo(this.x, this.y);
   }
 
+  get floors() {
+    return this.height / this.floorHeight;
+  }
+
   drawFloors(ctx) {
     for (let i = this.floorHeight; i < this.height; i += this.floorHeight) {
       ctx.moveTo(this.x + this.lift.width + this.strokeLineWidth, this.y + i);
       ctx.lineTo(this.x + this.width, this.y + i);
     }
+  }
+
+  get liftEntranceX() {
+    return this.x + this.lift.width;
   }
 
   draw(ctx) {

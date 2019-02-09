@@ -1,20 +1,55 @@
-const initialState = {
-  inBuilding: false,
-  inLift: false,
-  isWorking: false
-};
+
+class State {
+  constructor() {
+    this.enteringBuilding = true;
+    this.headingTowardsLift = false;
+    this.callingLift = false;
+    this.waitingForLift = false;
+    this.gettingInsideLift = false;
+    this.choosingFloor = false;
+    this.waitingInsideLift = false;
+    this.goingToWork = false;
+    this.working = false;
+  }
+}
+
 class Person {
   constructor(x, y, building) {
     this.height = 15;
     this.x = x;
     this.y = y - this.height;
     this.building = building;
-    this.inBuilding = false;
     this.width = 10;
     this.colour = "#3dc92e";
     this.whatever = 5;
-    this.state = initialState;
+    this.state = new State();
     this.speed = 1;
+    this.destinationFloor = 0;
+    this.workingTime = 0;
+    this.timeWorked = 0;
+    console.log(this.state);
+  }
+
+  update() {
+    if (this.state.enteringBuilding) {
+      this.goToBuildingEntrance();
+    } else if (this.state.headingTowardsLift) {
+      this.goToLiftEntrance();
+    } else if (this.state.callingLift) {
+      this.callLift();
+    } else if (this.state.waitingForLift) {
+      this.waitForLift();
+    } else if (this.state.gettingInsideLift) {
+      this.goIntoLift();
+    } else if (this.state.choosingFloor) {
+      this.chooseFloor();
+    } else if (this.state.waitingInsideLift) {
+      this.waitInsideLift();
+    } else if (this.state.goingToWork) {
+      this.goToWork();
+    } else if (this.state.working) {
+      this.work();
+    }
   }
 
   draw(ctx) {
@@ -39,36 +74,115 @@ class Person {
     }
   }
 
+  destinationReached(dest) {
+    return this.x === dest.x && this.y === dest.y;
+  }
+
   goToBuildingEntrance() {
-    const destX = this.building.entrance.x;
-    const destY = this.building.entrance.y - this.height;
-    this.state.inBuilding =
-      this.x === destX  &&
-      this.y === destY 
-    if (this.state.inBuilding) {
+    const destination = {
+      x: this.building.entrance.x,
+      y: this.building.entrance.y - this.height
+    };
+    if (this.destinationReached(destination)) {
+      this.state.enteringBuilding = false;
+      this.state.headingTowardsLift = true;
       return;
     }
-    this.goToPoint(destX, destY);
+    this.goToPoint(destination.x, destination.y);
   }
 
-  goToLift() {
-    const destX = this.building.lift.x + this.building.lift.width / 2;
-    const destY = this.building.lift.y + this.building.lift.height - this.height;
-    this.state.inLift = this.x === destX && this.y === destY;
-    if (this.state.inLift) {
+  goToLiftEntrance() {
+    const destination = {
+      x: this.building.liftEntranceX + this.width,
+      y: this.y
+    };
+    if (this.destinationReached(destination)) {
+      this.state.headingTowardsLift = false;
+      this.state.callingLift = true;
       return;
     }
-    this.goToPoint(destX, destY);
+    this.goToPoint(destination.x, destination.y);
   }
 
-  update() {
-    if (!this.state.inBuilding) {
-      this.goToBuildingEntrance();
-    } else if (!this.state.inLift) {
-      this.goToLift();
-    } else if (this.state.inBuilding && this.state.inLift) {
-      this.building.lift.goToFloor(5);
-      this.y = this.building.lift.y + this.building.lift.height - this.height;
+  callLift() {
+    if (!this.building.lift.isMoving) {
+      this.building.lift.goToFloor(this.currentFloor);
+      this.state.callingLift = false;
+      this.state.waitingForLift = true;
     }
+  }
+
+  waitForLift() {
+    if (this.currentFloor === this.building.lift.currentFloor) {
+      this.state.waitingForLift = false;
+      this.state.gettingInsideLift = true;
+    }
+  }
+
+  goIntoLift() {
+    const dest = {
+      x: this.building.lift.x + (this.building.lift.width / 2),
+      y: this.building.lift.y + this.building.lift.height - this.height - this.building.strokeLineWidth
+    }
+    if (this.destinationReached(dest)) {
+      this.state.gettingInsideLift = false;
+      this.state.choosingFloor = true;
+      return;
+    }
+    this.goToPoint(dest.x, dest.y);
+  }
+
+  chooseFloor() {
+    this.destinationFloor = Math.floor(Math.random() * Math.floor(this.building.floors));
+    this.building.lift.goToFloor(this.destinationFloor);
+    this.state.choosingFloor = false;
+    this.state.waitingInsideLift = true;
+  }
+
+  waitInsideLift() {
+    const destinationReached = !this.building.lift.isMoving && this.currentFloor === this.destinationFloor;
+    if (!destinationReached) {
+      const bottomOfLift = this.building.lift.y + this.building.lift.height - this.building.strokeLineWidth;
+      this.y = bottomOfLift - this.height;
+    } else {
+      this.state.waitingInsideLift = false;
+      this.state.goingToWork = true;
+    }
+  }
+
+  goToWork() {
+    const dest = {
+      x: this.building.x + (this.building.width / 2),
+      y: this.y
+    };
+    if (this.destinationReached(dest)) {
+      this.state.goingToWork = false;
+      this.state.working = true;
+      return;
+    }
+    this.goToPoint(dest.x, dest.y);
+  }
+
+  work() {
+    if (this.workingTime === 0) {
+      const minTime = 200;
+      const maxTime = 600;
+      this.workingTime = Math.floor(Math.random() * (maxTime - minTime) + minTime);
+    }
+    if (this.timeWorked > this.workingTime) {
+      this.state.working = false;
+      this.state.headingTowardsLift = true;
+      this.workingTime = 0;
+      this.timeWorked = 0;
+      return;
+    }
+    this.timeWorked += 1;
+  }
+
+  get currentFloor() {
+    const currentY = this.y + this.height;
+    const tolerancePixels = 10;
+    const match = this.building.floorsYStartPositions.findIndex(y => y > currentY - tolerancePixels && y < currentY + tolerancePixels);
+    return match;
   }
 }
