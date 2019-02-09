@@ -24,7 +24,6 @@ class Building {
       floorsYStartPositions.push(i);
     }
     this.floorsYStartPositions = floorsYStartPositions;
-    console.log(floorsYStartPositions);
   }
 
   drawOutline(ctx) {
@@ -46,6 +45,11 @@ class Building {
     }
   }
 
+  drawFloorNumbers(ctx){
+    ctx.font = "12px Arial";
+    this.floorsYStartPositions.forEach((floor, i) => ctx.fillText(i, this.x + this.width - 20,  floor - 10));
+  }
+
   get liftEntranceX() {
     return this.x + this.lift.width;
   }
@@ -59,5 +63,6 @@ class Building {
     ctx.lineWidth = this.strokeLineWidth;
     ctx.stroke();
     ctx.closePath();
+    this.drawFloorNumbers(ctx);
   }
 }

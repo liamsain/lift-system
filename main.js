@@ -13,6 +13,7 @@ entities = [...entities, ...people];
 const drawEntities = () => entities.forEach(x => x.draw(ctx));
 
 function draw() {
+  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
   if(entities.length - 2 < peopleCountElement.value){
     console.log('adding entitiy');
     entities.push(new Person(peopleSpawnPoint.x, peopleSpawnPoint.y, building));
@@ -20,7 +21,6 @@ function draw() {
     console.log('removing entity');
      entities.pop();
   }
-  ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
   drawEntities();
   requestAnimationFrame(draw);

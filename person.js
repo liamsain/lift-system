@@ -174,7 +174,7 @@ class Person {
   work() {
     if (this.workingTime === 0) {
       const minTime = 800;
-      const maxTime = 1500;
+      const maxTime = 3000;
       this.workingTime = Math.floor(Math.random() * (maxTime - minTime) + minTime);
     }
     if (this.timeWorked > this.workingTime) {
