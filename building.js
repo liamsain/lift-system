@@ -17,13 +17,14 @@ class Building {
     this.entrance = { x: this.x + this.width, y: this.y + this.height - (this.strokeLineWidth / 2) };
     this.init();
   }
-  
+
   init() {
     const floorsYStartPositions = [];
     for (let i = this.height + this.y; i > this.y; i -= this.floorHeight) {
       floorsYStartPositions.push(i);
     }
     this.floorsYStartPositions = floorsYStartPositions;
+    console.log(floorsYStartPositions);
   }
 
   drawOutline(ctx) {

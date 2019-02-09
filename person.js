@@ -27,7 +27,6 @@ class Person {
     this.destinationFloor = 0;
     this.workingTime = 0;
     this.timeWorked = 0;
-    console.log(this.state);
   }
 
   update() {
@@ -105,11 +104,9 @@ class Person {
   }
 
   callLift() {
-    if (!this.building.lift.isMoving) {
-      this.building.lift.goToFloor(this.currentFloor);
-      this.state.callingLift = false;
-      this.state.waitingForLift = true;
-    }
+    this.building.lift.goToFloor(this.currentFloor);
+    this.state.callingLift = false;
+    this.state.waitingForLift = true;
   }
 
   waitForLift() {
@@ -129,7 +126,9 @@ class Person {
       this.state.choosingFloor = true;
       return;
     }
-    this.goToPoint(dest.x, dest.y);
+    if (!this.building.lift.isMoving) {
+      this.goToPoint(dest.x, dest.y);
+    }
   }
 
   chooseFloor() {
@@ -140,7 +139,7 @@ class Person {
   }
 
   waitInsideLift() {
-    const destinationReached = !this.building.lift.isMoving && this.currentFloor === this.destinationFloor;
+    const destinationReached = !this.building.lift.state.moving && this.currentFloor === this.destinationFloor;
     if (!destinationReached) {
       const bottomOfLift = this.building.lift.y + this.building.lift.height - this.building.strokeLineWidth;
       this.y = bottomOfLift - this.height;
@@ -165,8 +164,8 @@ class Person {
 
   work() {
     if (this.workingTime === 0) {
-      const minTime = 200;
-      const maxTime = 600;
+      const minTime = 800;
+      const maxTime = 1500;
       this.workingTime = Math.floor(Math.random() * (maxTime - minTime) + minTime);
     }
     if (this.timeWorked > this.workingTime) {
