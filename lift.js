@@ -59,6 +59,14 @@ class Lift {
       if (this.waitedFor >= this.waitingTime) {
         this.state.waitingAtDestination = false;
         this.state.waitingForInstruction = true;
+        const goingUp = this.destinations[0] < this.y;
+        if (goingUp) {
+          // highest to lowest
+          this.destinations.sort((a, b) => b - a);
+        } else {
+          this.destinations.sort((a, b) => a - b);
+        }
+        console.log(this.destinations);
         this.waitedFor = 0;
       }
       this.waitedFor += 1;
@@ -71,7 +79,7 @@ class Lift {
     const destY = groundFloorY - distanceToTravel;
     if (!this.destinations.includes(destY)) {
       this.destinations.push(destY);
+      console.log(this.destinations);
     }
-    console.log(this.destinations);
   }
 }
