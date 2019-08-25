@@ -2,7 +2,6 @@ canvas {
     padding: 0;
     margin: auto;
     display: block;
-    width: 800px;
     border: 1px solid black
 }
 #people-count-input{

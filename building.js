@@ -1,12 +1,12 @@
 class Building {
-  constructor() {
-    this.x = canvas.width / 4;
-    this.y = canvas.height / 10;
-    this.width = canvas.width * 0.5;
-    this.height = canvas.height * 0.8;
+  constructor(x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
     this.colour = "#000000";
     this.floorHeight = this.height / 10;
-    this.strokeLineWidth = 6;
+    this.strokeLineWidth = 3;
     this.lift = new Lift(
       this.x + this.strokeLineWidth,
       this.y + this.height,

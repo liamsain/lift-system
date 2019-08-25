@@ -15,12 +15,12 @@ class State {
 }
 
 class Person {
-  constructor(x, y, building) {
-    this.height = 15;
+  constructor(x, y, height, building) {
+    this.height = height;
     this.x = x;
-    this.y = y - this.height;
+    this.y = y - height;
     this.building = building;
-    this.width = 10;
+    this.width = height / 2;
     this.colour = this.getRandomColour(); 
     this.whatever = 5;
     this.state = new State();
@@ -83,7 +83,10 @@ class Person {
   }
 
   destinationReached(dest) {
-    return this.x === dest.x && this.y === dest.y;
+    const tolerance = 3;
+    const xWithinRange = (this.x >= dest.x - tolerance && this.x <= dest.x + tolerance);
+    const yWithinRange = (this.y >= dest.y - tolerance && this.y <= dest.y + tolerance);
+    return xWithinRange && yWithinRange;
   }
 
   goToBuildingEntrance() {
@@ -91,6 +94,7 @@ class Person {
       x: this.building.entrance.x,
       y: this.building.entrance.y - this.height
     };
+    console.log(destination, {x: this.x, y: this.y} );
     if (this.destinationReached(destination)) {
       this.state.enteringBuilding = false;
       this.state.headingTowardsLift = true;
