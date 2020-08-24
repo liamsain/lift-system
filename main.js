@@ -1,3 +1,7 @@
+// todos:
+// make parameters configurable by user 
+//  e.g. user can control num of people per building, speed of people, floors per building, amount of buildings 
+// make a ridiculous amount of buildings
 const canvas = document.getElementById("theCanvas");
 const ctx = canvas.getContext("2d");
 const peopleHeight = 10;

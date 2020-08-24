@@ -1,5 +1,5 @@
-const States = {
-  WaitingForInstruction: 'waitingForInstruction',
+const LiftStates = {
+  Idle: 'idle',
   Moving: 'moving',
   MovingUp: 'movingUp',
   MovingDown: 'movingDown',
@@ -17,9 +17,11 @@ class Lift {
     this.width = width;
     this.speed = 0.5;
     this.destinations = [];
+    this.upDestinations = [];
+    this.downDestinations = [];
     this.waitingTime = 100;
     this.waitedFor = 0;
-    this.state = States.WaitingForInstruction;
+    this.state = LiftStates.Idle;
   }
 
   draw(ctx) {
@@ -33,43 +35,63 @@ class Lift {
   }
 
   get currentFloor() {
-    if (this.state === States.Moving)
+    if (this.state === LiftStates.Moving)
       return undefined;
     const match = this.building.floorsYStartPositions.findIndex(y => y === this.y + this.height);
     return match;
   }
 
   update() {
-    if (this.state === States.WaitingForInstruction) {
+  //
+  //at rest
+  //hey, someone wants to go up
+  //am i going up or down?
+  //up
+  //ok, go to them
+  //wait for them to get in
+  //head to where they wanna go
+  //
+    if (this.state === LiftStates.Idle) {
       if (this.destinations.length > 0) {
-        this.state = States.Moving;
+        this.state = LiftStates.Moving;
       }
-    } else if (this.state === States.Moving) {
-      const destination = this.destinations[0];
+    } else if (this.state === LiftStates.MovingUp) {
+      this.moveUp();
+      /*const destination = this.destinations[0];
       if (this.y !== destination) {
         if (this.y > destination)
           this.y -= this.speed;
         else
           this.y += this.speed;
       } else {
-        this.state = States.WaitingAtDestination;
+        this.state = LiftStates.WaitingAtDestination;
         this.destinations.shift();
       }
-    } else if (this.state === States.WaitingAtDestination) {
-      if (this.waitedFor >= this.waitingTime) {
-        this.state = States.WaitingForInstruction;
-        const goingUp = this.destinations[0] < this.y;
-        if (goingUp) {
-          // highest to lowest
-          this.destinations.sort((a, b) => b - a);
-        } else {
-          this.destinations.sort((a, b) => a - b);
-        }
-        this.waitedFor = 0;
-      }
-      this.waitedFor += 1;
+      */
+    } else if(this.state === LiftStates.MovingDown) {
+      this.moveDown();
+    } else if (this.state === LiftStates.WaitingAtDestination) {
+      this.waitForInstruction();
     }
   }
+  waitForInstruction() {
+    if (this.waitedFor >= this.waitingTime) {
+      this.state = LiftStates.Idle;
+      const goingUp = this.destinations[0] < this.y;
+      if (goingUp) {
+        // highest to lowest
+        this.destinations.sort((a, b) => b - a);
+      } else {
+        this.destinations.sort((a, b) => a - b);
+      }
+      this.waitedFor = 0;
+    }
+    this.waitedFor += 1;
+  }
+  moveUp() {
+    
+  }
+  moveDown() {}
 
   goToFloor(number) {
     const groundFloorY = this.building.y + this.building.height - this.height;
@@ -77,9 +99,20 @@ class Lift {
     const destY = groundFloorY - distanceToTravel;
     if (!this.destinations.includes(destY)) {
       this.destinations.push(destY);
-    }
+    } 
   }
   get isMoving() {
-    return this.state === States.Moving;
+    return this.state === LiftStates.Moving;
   }
+  goingUp(floorNumber) {
+    if (!this.upDestinations.includes(floorNumber)) {
+      this.upDestinations.push(floorNumber);
+    }
+  }
+  goingDown(floorNumber) {
+    if (!this.downDestinations.includes(floorNumber)) {
+      this.downDestinations.push(floorNumber);
+    }
+  }
+
 }

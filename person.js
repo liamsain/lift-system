@@ -112,7 +112,20 @@ class Person {
   }
 
   callLift() {
-    this.building.lift.goToFloor(this.currentFloor);
+    let destinationFloorMatchesCurrentFloor = true;
+    let destinationFloor = 0;
+    while(destinationFloorMatchesCurrentFloor) {
+      destinationFloor = Math.floor(Math.random() * Math.floor(this.building.floors));
+      if (destinationFloor !== this.currentFloor) {
+        destinationFloorMatchesCurrentFloor = false;
+      }
+    }
+    this.destinationFloor = destinationFloor;
+    if (destinationFloor > this.currentFloor) {
+      this.building.lift.goingUp(this.currentFloor);
+    } else {
+      this.building.lift.goingDown(this.currentFloor);
+    }
     this.state = PersonStates.WaitingForLift;
   }
 
@@ -137,7 +150,6 @@ class Person {
   }
 
   chooseFloor() {
-    this.destinationFloor = Math.floor(Math.random() * Math.floor(this.building.floors));
     this.building.lift.goToFloor(this.destinationFloor);
     this.state = PersonStates.WaitingInsideLift;
   }
@@ -182,7 +194,8 @@ class Person {
   get currentFloor() {
     const currentY = this.y + this.height;
     const tolerancePixels = 10;
-    const match = this.building.floorsYStartPositions.findIndex(y => y > currentY - tolerancePixels && y < currentY + tolerancePixels);
+    const match = this.building.floorsYStartPositions
+      .findIndex(y => y > currentY - tolerancePixels && y < currentY + tolerancePixels);
     return match;
   }
 }
