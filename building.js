@@ -31,7 +31,7 @@ class Building {
     ctx.lineTo(this.x, this.y + this.height);
     ctx.lineTo(this.x + this.width, this.y + this.height);
     ctx.lineTo(this.x + this.width, this.y);
-    ctx.lineTo(this.x, this.y);
+    ctx.lineTo(this.x - (this.strokeLineWidth / 2), this.y);
   }
 
   get floors() {

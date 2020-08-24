@@ -1,10 +1,12 @@
-class LiftState {
-  constructor() {
-    this.waitingForInstruction = true;
-    this.moving = false;
-    this.waitingAtDestination = false;
-  }
-}
+const States = {
+  WaitingForInstruction: 'waitingForInstruction',
+  Moving: 'moving',
+  MovingUp: 'movingUp',
+  MovingDown: 'movingDown',
+  WaitingAtDestination: 'waitingAtDestination'
+};
+
+
 class Lift {
   constructor(x, y, width, height, building) {
     this.x = x;
@@ -17,7 +19,7 @@ class Lift {
     this.destinations = [];
     this.waitingTime = 50;
     this.waitedFor = 0;
-    this.state = new LiftState();
+    this.state = States.WaitingForInstruction;
   }
 
   draw(ctx) {
@@ -31,19 +33,18 @@ class Lift {
   }
 
   get currentFloor() {
-    if (this.state.moving)
+    if (this.state === States.Moving)
       return undefined;
     const match = this.building.floorsYStartPositions.findIndex(y => y === this.y + this.height);
     return match;
   }
 
   update() {
-    if (this.state.waitingForInstruction) {
+    if (this.state === States.WaitingForInstruction) {
       if (this.destinations.length > 0) {
-        this.state.waitingForInstruction = false;
-        this.state.moving = true;
+        this.state = States.Moving;
       }
-    } else if (this.state.moving) {
+    } else if (this.state === States.Moving) {
       const destination = this.destinations[0];
       if (this.y !== destination) {
         if (this.y > destination)
@@ -51,14 +52,12 @@ class Lift {
         else
           this.y += this.speed;
       } else {
-        this.state.moving = false;
-        this.state.waitingAtDestination = true;
+        this.state = States.WaitingAtDestination;
         this.destinations.shift();
       }
-    } else if (this.state.waitingAtDestination) {
+    } else if (this.state === States.WaitingAtDestination) {
       if (this.waitedFor >= this.waitingTime) {
-        this.state.waitingAtDestination = false;
-        this.state.waitingForInstruction = true;
+        this.state = States.WaitingForInstruction;
         const goingUp = this.destinations[0] < this.y;
         if (goingUp) {
           // highest to lowest

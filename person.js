@@ -24,7 +24,7 @@ class Person {
     this.colour = this.getRandomColour(); 
     this.whatever = 5;
     this.state = new State();
-    this.speed = 1;
+    this.speed = Math.random() * (2 - 0.5) + 0.5;
     this.destinationFloor = 0;
     this.workingTime = 0;
     this.timeWorked = 0;
