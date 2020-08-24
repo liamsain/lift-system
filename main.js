@@ -1,7 +1,5 @@
-
 const canvas = document.getElementById("theCanvas");
 const ctx = canvas.getContext("2d");
-const peopleCountElement = document.getElementById("people-count-input");
 const peopleHeight = 10;
 
 const buildings = [
@@ -14,6 +12,20 @@ const buildings = [
   new Building(600, 420, 240, 300),
   new Building(870, 450, 270, 320)
 ];
+/*
+ * make loads of buildings!
+ *
+ * const buildingCount = 200;
+for(let i = 0; i < buildingCount; i += 1) {
+  let x = 20;
+  let y = 20;
+  buildings.push(
+    new Building(
+      
+    )
+  );
+}
+*/
 
 let people = [];
 buildings.forEach(building => {

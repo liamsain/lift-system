@@ -17,7 +17,7 @@ class Lift {
     this.width = width;
     this.speed = 0.5;
     this.destinations = [];
-    this.waitingTime = 50;
+    this.waitingTime = 100;
     this.waitedFor = 0;
     this.state = States.WaitingForInstruction;
   }
@@ -65,7 +65,6 @@ class Lift {
         } else {
           this.destinations.sort((a, b) => a - b);
         }
-        console.log(this.destinations);
         this.waitedFor = 0;
       }
       this.waitedFor += 1;
@@ -78,7 +77,9 @@ class Lift {
     const destY = groundFloorY - distanceToTravel;
     if (!this.destinations.includes(destY)) {
       this.destinations.push(destY);
-      console.log(this.destinations);
     }
+  }
+  get isMoving() {
+    return this.state === States.Moving;
   }
 }

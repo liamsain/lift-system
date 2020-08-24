@@ -1,18 +1,16 @@
 const hexNumbers = '0123456789ABCDEF';
 
-class State {
-  constructor() {
-    this.enteringBuilding = true;
-    this.headingTowardsLift = false;
-    this.callingLift = false;
-    this.waitingForLift = false;
-    this.gettingInsideLift = false;
-    this.choosingFloor = false;
-    this.waitingInsideLift = false;
-    this.goingToWork = false;
-    this.working = false;
-  }
-}
+const PersonStates = {
+  EnteringBuilding: 'enteringBuilding',
+  HeadingTowardsLift: 'headingTowardsLift',
+  CallingLift: 'callingLift',
+  WaitingForLift: 'waitingForLift',
+  GettingInsideLift: 'gettingInsideLift',
+  ChoosingFloor: 'choosingFloor',
+  WaitingInsideLift: 'waitingInsideLift',
+  GoingToWork: 'goingToWork',
+  Working: 'working'
+};
 
 class Person {
   constructor(x, y, height, building) {
@@ -22,9 +20,9 @@ class Person {
     this.building = building;
     this.width = height / 2;
     this.colour = this.getRandomColour(); 
-    this.whatever = 5;
-    this.state = new State();
-    this.speed = Math.random() * (2 - 0.5) + 0.5;
+    this.state = PersonStates.EnteringBuilding;
+    // this.speed = Math.random() * (1.2 - 0.3) + 0.5;
+    this.speed = 1.2;
     this.destinationFloor = 0;
     this.workingTime = 0;
     this.timeWorked = 0;
@@ -39,23 +37,23 @@ class Person {
   }
 
   update() {
-    if (this.state.enteringBuilding) {
+    if (this.state === PersonStates.EnteringBuilding) {
       this.goToBuildingEntrance();
-    } else if (this.state.headingTowardsLift) {
+    } else if (this.state === PersonStates.HeadingTowardsLift) {
       this.goToLiftEntrance();
-    } else if (this.state.callingLift) {
+    } else if (this.state === PersonStates.CallingLift) {
       this.callLift();
-    } else if (this.state.waitingForLift) {
+    } else if (this.state === PersonStates.WaitingForLift) {
       this.waitForLift();
-    } else if (this.state.gettingInsideLift) {
+    } else if (this.state === PersonStates.GettingInsideLift) {
       this.goIntoLift();
-    } else if (this.state.choosingFloor) {
+    } else if (this.state === PersonStates.ChoosingFloor) {
       this.chooseFloor();
-    } else if (this.state.waitingInsideLift) {
+    } else if (this.state === PersonStates.WaitingInsideLift) {
       this.waitInsideLift();
-    } else if (this.state.goingToWork) {
+    } else if (this.state === PersonStates.GoingToWork) {
       this.goToWork();
-    } else if (this.state.working) {
+    } else if (this.state === PersonStates.Working) {
       this.work();
     }
   }
@@ -94,10 +92,8 @@ class Person {
       x: this.building.entrance.x,
       y: this.building.entrance.y - this.height
     };
-    console.log(destination, {x: this.x, y: this.y} );
     if (this.destinationReached(destination)) {
-      this.state.enteringBuilding = false;
-      this.state.headingTowardsLift = true;
+      this.state = PersonStates.HeadingTowardsLift;
       return;
     }
     this.goToPoint(destination.x, destination.y);
@@ -109,8 +105,7 @@ class Person {
       y: this.y
     };
     if (this.destinationReached(destination)) {
-      this.state.headingTowardsLift = false;
-      this.state.callingLift = true;
+      this.state = PersonStates.CallingLift;
       return;
     }
     this.goToPoint(destination.x, destination.y);
@@ -118,14 +113,12 @@ class Person {
 
   callLift() {
     this.building.lift.goToFloor(this.currentFloor);
-    this.state.callingLift = false;
-    this.state.waitingForLift = true;
+    this.state = PersonStates.WaitingForLift;
   }
 
   waitForLift() {
     if (this.currentFloor === this.building.lift.currentFloor) {
-      this.state.waitingForLift = false;
-      this.state.gettingInsideLift = true;
+      this.state = PersonStates.GettingInsideLift;
     }
   }
 
@@ -135,8 +128,7 @@ class Person {
       y: this.building.lift.y + this.building.lift.height - this.height - this.building.strokeLineWidth
     }
     if (this.destinationReached(dest)) {
-      this.state.gettingInsideLift = false;
-      this.state.choosingFloor = true;
+      this.state = PersonStates.ChoosingFloor;
       return;
     }
     if (!this.building.lift.isMoving) {
@@ -147,18 +139,16 @@ class Person {
   chooseFloor() {
     this.destinationFloor = Math.floor(Math.random() * Math.floor(this.building.floors));
     this.building.lift.goToFloor(this.destinationFloor);
-    this.state.choosingFloor = false;
-    this.state.waitingInsideLift = true;
+    this.state = PersonStates.WaitingInsideLift;
   }
 
   waitInsideLift() {
-    const destinationReached = !this.building.lift.state.moving && this.currentFloor === this.destinationFloor;
+    const destinationReached = !this.building.lift.isMoving && this.currentFloor === this.destinationFloor;
     if (!destinationReached) {
       const bottomOfLift = this.building.lift.y + this.building.lift.height - this.building.strokeLineWidth;
       this.y = bottomOfLift - this.height;
     } else {
-      this.state.waitingInsideLift = false;
-      this.state.goingToWork = true;
+      this.state = PersonStates.GoingToWork;
     }
   }
 
@@ -168,8 +158,7 @@ class Person {
       y: this.y
     };
     if (this.destinationReached(dest)) {
-      this.state.goingToWork = false;
-      this.state.working = true;
+      this.state = PersonStates.Working;
       return;
     }
     this.goToPoint(dest.x, dest.y);
@@ -182,8 +171,7 @@ class Person {
       this.workingTime = Math.floor(Math.random() * (maxTime - minTime) + minTime);
     }
     if (this.timeWorked > this.workingTime) {
-      this.state.working = false;
-      this.state.headingTowardsLift = true;
+      this.state = PersonStates.HeadingTowardsLift;
       this.workingTime = 0;
       this.timeWorked = 0;
       return;
