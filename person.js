@@ -16,16 +16,17 @@ class Person {
   constructor(x, y, height, building) {
     this.height = height;
     this.x = x;
-    this.y = y - height;
     this.building = building;
+    this.y = Math.round(y - height - (this.building.strokeLineWidth / 2));
     this.width = height / 2;
     this.colour = this.getRandomColour(); 
     this.state = PersonStates.EnteringBuilding;
     // this.speed = Math.random() * (1.2 - 0.3) + 0.5;
-    this.speed = 1.2;
+    this.speed = 1;
     this.destinationFloor = 0;
     this.workingTime = 0;
     this.timeWorked = 0;
+    this.direction = '';
   }
 
   getRandomColour() {
@@ -81,7 +82,7 @@ class Person {
   }
 
   destinationReached(dest) {
-    const tolerance = 3;
+    const tolerance = 1;
     const xWithinRange = (this.x >= dest.x - tolerance && this.x <= dest.x + tolerance);
     const yWithinRange = (this.y >= dest.y - tolerance && this.y <= dest.y + tolerance);
     return xWithinRange && yWithinRange;
@@ -121,24 +122,31 @@ class Person {
       }
     }
     this.destinationFloor = destinationFloor;
-    if (destinationFloor > this.currentFloor) {
+    const goingUp = destinationFloor > this.currentFloor;
+    if (goingUp) {
+      this.direction = Directions.Up;
       this.building.lift.goingUp(this.currentFloor);
     } else {
+      this.direction = Directions.Down;
       this.building.lift.goingDown(this.currentFloor);
     }
     this.state = PersonStates.WaitingForLift;
   }
 
   waitForLift() {
-    if (this.currentFloor === this.building.lift.currentFloor) {
-      this.state = PersonStates.GettingInsideLift;
+    if (this.currentFloor !== this.building.lift.currentFloor) {
+      return;
     }
+    if (this.building.lift.direction !== this.direction) {
+      return;
+    }
+    this.state = PersonStates.GettingInsideLift;
   }
 
   goIntoLift() {
     const dest = {
       x: this.building.lift.x + (this.building.lift.width / 2),
-      y: this.building.lift.y + this.building.lift.height - this.height - this.building.strokeLineWidth
+      y: Math.round(this.building.lift.y + this.building.lift.height - this.height - (this.building.strokeLineWidth / 2))
     }
     if (this.destinationReached(dest)) {
       this.state = PersonStates.ChoosingFloor;
@@ -157,8 +165,8 @@ class Person {
   waitInsideLift() {
     const destinationReached = !this.building.lift.isMoving && this.currentFloor === this.destinationFloor;
     if (!destinationReached) {
-      const bottomOfLift = this.building.lift.y + this.building.lift.height - this.building.strokeLineWidth;
-      this.y = bottomOfLift - this.height;
+      const bottomOfLift = this.building.lift.y + this.building.lift.height - this.height - (this.building.strokeLineWidth / 2);
+      this.y = bottomOfLift;
     } else {
       this.state = PersonStates.GoingToWork;
     }
@@ -193,7 +201,7 @@ class Person {
 
   get currentFloor() {
     const currentY = this.y + this.height;
-    const tolerancePixels = 10;
+    const tolerancePixels = 5;
     const match = this.building.floorsYStartPositions
       .findIndex(y => y > currentY - tolerancePixels && y < currentY + tolerancePixels);
     return match;

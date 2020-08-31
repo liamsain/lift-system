@@ -5,7 +5,8 @@ class Building {
     this.width = width;
     this.height = height;
     this.colour = "#000000";
-    this.floorHeight = this.height / 10;
+    this.floors = 10;
+    this.floorHeight = this.height / this.floors;
     this.strokeLineWidth = 3;
     this.lift = new Lift(
       this.x + this.strokeLineWidth,
@@ -23,6 +24,7 @@ class Building {
     for (let i = this.height + this.y; i > this.y; i -= this.floorHeight) {
       floorsYStartPositions.push(i);
     }
+
     this.floorsYStartPositions = floorsYStartPositions;
   }
 
@@ -34,9 +36,6 @@ class Building {
     ctx.lineTo(this.x - (this.strokeLineWidth / 2), this.y);
   }
 
-  get floors() {
-    return this.height / this.floorHeight;
-  }
 
   drawFloors(ctx) {
     for (let i = this.floorHeight; i < this.height; i += this.floorHeight) {
@@ -65,5 +64,9 @@ class Building {
     ctx.stroke();
     ctx.closePath();
     this.drawFloorNumbers(ctx);
+  }
+
+  get floorNumbersWithYCoords() {
+    return this.floorsYStartPositions.map((y, i) => ({number: i, y})); 
   }
 }
